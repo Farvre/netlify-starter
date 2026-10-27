@@ -1,7 +1,10 @@
+[build]
+  command = "rm -rf node_modules/@mathjax node_modules/katex node_modules/leancloud-realtime node_modules/speech-rule-engine node_modules/@cloudbase/types"
+
 [build.environment]
   NODE_VERSION = "24"
+  MARKDOWN_TEX = "false"
 
-  [functions]
-    directory = "netlify/functions/"
-      node_bundler = "zisi"
-      
+[functions]
+  directory = "netlify/functions/"
+  node_bundler = "zisi"

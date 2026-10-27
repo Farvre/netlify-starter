@@ -1,6 +1,7 @@
 [build.environment]
   NODE_VERSION = "24"
-  
-[functions]
-  directory = "netlify/functions/"
-  node_bundler = "esbuild"
+
+  [functions]
+    directory = "netlify/functions/"
+      node_bundler = "zisi"
+      

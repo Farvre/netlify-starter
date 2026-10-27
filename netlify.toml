@@ -1,5 +1,5 @@
 [build]
-  command = "rm -rf node_modules/@mathjax node_modules/katex node_modules/leancloud-realtime node_modules/speech-rule-engine node_modules/@cloudbase/types"
+  command = "node prune.js"
 
 [build.environment]
   NODE_VERSION = "24"

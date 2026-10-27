@@ -34,6 +34,8 @@ stub('@mdit/plugin-mathjax', {
   'sync.js': noopPlugin,
 }, { exports: { '.': './index.js', './sync': './sync.js', './package.json': './package.json' } });
 stub('@mdit/plugin-katex', { 'index.js': noopPlugin }, { exports: { '.': './index.js', './package.json': './package.json' } });
+// @mdit/plugin-emoji 是纯 ESM 包，某些 Node 运行时 require() 会直接崩 —— 换成 CJS 空壳
+stub('@mdit/plugin-emoji', { 'index.js': 'exports.fullEmoji = function fullEmoji() {};\n' });
 stub('katex');
 stub('@mathjax/src');
 stub('@mathjax/mathjax-newcm-font');

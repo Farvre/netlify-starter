@@ -6,13 +6,13 @@ const path = require('path');
 
 const NM = path.join(__dirname, 'node_modules');
 
-function stub(name, files) {
+function stub(name, files, pkgExtra) {
   const dir = path.join(NM, ...name.split('/'));
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(
     path.join(dir, 'package.json'),
-    JSON.stringify({ name, version: '0.0.0', main: 'index.js' })
+    JSON.stringify({ name, version: '0.0.0', main: 'index.js', ...pkgExtra })
   );
   const entries = files || { 'index.js': 'module.exports = {};' };
   for (const [f, content] of Object.entries(entries)) {
@@ -26,12 +26,14 @@ function remove(name) {
   console.log('removed  ', name);
 }
 
-// 数学公式渲染（评论区不需要）
+// 数学公式渲染（评论区不需要，替换为无害的假插件）
+const noopPlugin =
+  'function createMathjaxInstance() { return {}; }\nfunction mathjax() {}\nfunction katex() {}\nexports.createMathjaxInstance = createMathjaxInstance;\nexports.mathjax = mathjax;\nexports.katex = katex;\n';
 stub('@mdit/plugin-mathjax', {
-  'index.js': 'module.exports = { createMathjaxInstance: () => ({}), mathjax: () => ({}) };',
-  'sync.js': 'module.exports = {};',
-});
-stub('@mdit/plugin-katex');
+  'index.js': noopPlugin,
+  'sync.js': noopPlugin,
+}, { exports: { '.': './index.js', './sync': './sync.js', './package.json': './package.json' } });
+stub('@mdit/plugin-katex', { 'index.js': noopPlugin }, { exports: { '.': './index.js', './package.json': './package.json' } });
 stub('katex');
 stub('@mathjax/src');
 stub('@mathjax/mathjax-newcm-font');

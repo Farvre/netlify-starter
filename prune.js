@@ -55,4 +55,29 @@ stub('better-sqlite3', {
 // 腾讯云类型定义包（纯类型，无运行时代码）
 stub('@cloudbase/types');
 
+// ── ESM → CJS 转换补丁 ──────────────────────────────────────────────
+// AWS Lambda 启动时带 --no-experimental-require-module（禁用 require 加载 ESM），
+// 而 jsdom 等 CJS 包会 require() 纯 ESM 依赖，启动即崩（502）。
+// cjs-patches/ 里是预先用 esbuild 转成 CJS 的等价包（功能完全一致），
+// 覆盖到 node_modules 上即可（用 conv.js 可在依赖升级后重新生成）。
+function restoreCjs(name) {
+  const src = path.join(__dirname, 'cjs-patches', ...name.split('/'));
+  const dest = path.join(NM, ...name.split('/'));
+  fs.rmSync(dest, { recursive: true, force: true });
+  fs.cpSync(src, dest, { recursive: true });
+  console.log('cjsified ', name);
+}
+[
+  '@exodus/bytes',
+  'parse5',
+  'entities',
+  '@asamuzakjp/css-color',
+  '@asamuzakjp/dom-selector',
+  '@csstools/css-calc',
+  '@csstools/css-color-parser',
+  '@csstools/css-parser-algorithms',
+  '@csstools/css-tokenizer',
+  '@csstools/color-helpers',
+].forEach(restoreCjs);
+
 console.log('prune done');

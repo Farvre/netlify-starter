@@ -63,9 +63,21 @@ stub('@cloudbase/types');
 function restoreCjs(name) {
   const src = path.join(__dirname, 'cjs-patches', ...name.split('/'));
   const dest = path.join(NM, ...name.split('/'));
+  // 嵌套 node_modules 必须保留（包内依赖的版本可能与顶层不同，zisi 会原样带上）
+  const nested = path.join(dest, 'node_modules');
+  const saved = path.join(__dirname, '.nested-save', ...name.split('/'));
+  const hasNested = fs.existsSync(nested);
+  if (hasNested) {
+    fs.mkdirSync(path.dirname(saved), { recursive: true });
+    fs.renameSync(nested, saved);
+  }
   fs.rmSync(dest, { recursive: true, force: true });
   fs.cpSync(src, dest, { recursive: true });
-  console.log('cjsified ', name);
+  if (hasNested) {
+    fs.mkdirSync(dest, { recursive: true });
+    fs.renameSync(saved, nested);
+  }
+  console.log('cjsified ', name, hasNested ? '(nested node_modules 保留)' : '');
 }
 [
   '@exodus/bytes',

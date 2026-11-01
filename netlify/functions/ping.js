@@ -31,6 +31,25 @@ exports.handler = async () => {
       return 'MISSING';
     }
   };
+  let lru = {};
+  try {
+    const lc = require('lru-cache');
+    lru = {
+      resolve: require.resolve('lru-cache'),
+      typeof: typeof lc,
+      keys: Object.keys(lc).slice(0, 10),
+      LRUCache: typeof lc.LRUCache,
+    };
+  } catch (e) {
+    lru = { err: (e.code || 'ERR') + ': ' + String(e.message).split('\n')[0] };
+  }
+  let cssColor = 'not-tested';
+  try {
+    require('@asamuzakjp/css-color');
+    cssColor = 'ok';
+  } catch (e) {
+    cssColor = (e.code || 'ERR') + ': ' + String(e.message).split('\n')[0];
+  }
   return {
     statusCode: 200,
     headers: { 'content-type': 'application/json' },
@@ -38,10 +57,10 @@ exports.handler = async () => {
       node: process.version,
       require_html_encoding_sniffer: sniff,
       require_parse5: parse5,
-      parse5_dir: listDir('/var/task/node_modules/parse5'),
-      parse5_dist: listDir('/var/task/node_modules/parse5/dist'),
-      parse5_dist_index: probe('/var/task/node_modules/parse5/dist/index.js'),
-      entities_dir: listDir('/var/task/node_modules/entities'),
+      require_css_color: cssColor,
+      lru_cache: lru,
+      lru_cache_dir: listDir('/var/task/node_modules/lru-cache'),
+      lru_cache_dist: listDir('/var/task/node_modules/lru-cache/dist'),
     }),
   };
 };

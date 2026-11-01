@@ -11,15 +11,17 @@
 
 # Waline 管理后台的 OAuth 回调把用户送到站点根路径的 /ui（服务端 this.redirect('/ui?token=...)），
 # 而函数只在 /.netlify/functions/comment/ui 下提供服务，根路径会得到 Netlify 的 404。
-# 这里把 /ui 与 /ui/* 重写到函数，登录后就能正常落到后台。
+# 注意不能用 200 rewrite：Netlify 重写到函数时仍把“原始路径”交给函数（event.path=/ui），
+# 而 Waline 的 dashboard 中间件只认 `${netlifyFunctionPrefix}/ui` 前缀，于是函数内部反而 404。
+# 用 302 让浏览器真正跳到函数地址，查询串（?token=）默认保留。
 [[redirects]]
   from = "/ui"
   to = "/.netlify/functions/comment/ui"
-  status = 200
+  status = 302
   force = false
 
 [[redirects]]
   from = "/ui/*"
   to = "/.netlify/functions/comment/ui/:splat"
-  status = 200
+  status = 302
   force = false

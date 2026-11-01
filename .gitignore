@@ -105,3 +105,9 @@ dist
 
 # Local Netlify folder
 .netlify
+
+# cjs-patches 里的 ESM→CJS 转换产物必须全部入库（上面的 dist 规则会误伤）
+!cjs-patches/**/dist
+!cjs-patches/**/dist/**
+!cjs-patches/**/lib
+!cjs-patches/**/lib/**
